@@ -22,7 +22,7 @@ public class GameWatcher
         while (!cancellationToken.IsCancellationRequested)
         {
             await CheckGameStateAsync();
-            await Task.Delay(1000, cancellationToken);
+            await Task.Delay(500, cancellationToken);
         }
 
         Logger.Info("event=watcher_stopped");
@@ -30,6 +30,17 @@ public class GameWatcher
 
     private async Task CheckGameStateAsync()
     {
+        if (!SteamProcessDetector.IsSteamRunning())
+        {
+            if (_currentAppId != null)
+            {
+                Logger.Warn("event=steam_restarted");
+                await HandleGameStoppedAsync();
+            }
+
+            return;
+        }
+
         var installDir = ProcessDetector.DetectRunningGame();
 
         if (installDir == null)
@@ -49,11 +60,23 @@ public class GameWatcher
 
     private void StartNewGame(string appId, string installDir)
     {
+        if (_currentAppId == appId && _workerProcess is { HasExited: false })
+            return;
+
         Logger.Info($"event=game_started appId={appId} game=\"{installDir}\"");
 
-        _workerProcess?.Kill(true);
-        _workerProcess = WorkerLauncher.Start(appId);
+        try
+        {
+            if (_workerProcess is { HasExited: false })
+            {
+                Logger.Info("event=worker_restart");
+                _workerProcess.Kill(true);
+                _workerProcess.WaitForExit();
+            }
+        }
+        catch { }
 
+        _workerProcess = WorkerLauncher.Start(appId);
         _currentAppId = appId;
     }
 

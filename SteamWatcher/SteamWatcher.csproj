@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -17,5 +17,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  
+  <Target Name="CopyWorker" AfterTargets="Publish">
+    <Copy 
+      SourceFiles="..\SteamAchievementWorker\bin\Release\net8.0\publish\SteamAchievementWorker.exe"
+      DestinationFolder="$(PublishDir)" />
+  </Target>
 
 </Project>

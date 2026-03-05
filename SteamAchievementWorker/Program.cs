@@ -73,6 +73,8 @@ async Task SendFullStateAsync(string currentAppId)
         };
 
         var json = JsonSerializer.Serialize(request);
+        //Logger.Info($"event=achievement_sync_payload json={json}");  //For Debugging
+
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         using var client = new HttpClient();
@@ -130,11 +132,13 @@ void OnAchievementStored(UserAchievementStored_t callback)
 {
     string apiName = callback.m_rgchAchievementName;
 
-    Logger.Info(
-        $"event=achievement_unlocked appId={appId} apiName=\"{apiName}\""
-    );
+    Logger.Info($"event=achievement_unlocked appId={appId} apiName=\"{apiName}\"");
 
-    _ = Task.Run(() => SendFullStateAsync(appId));
+    _ = Task.Run(async () =>
+    {
+        await Task.Delay(1000);   // Steam Zeit geben
+        await SendFullStateAsync(appId);
+    });
 }
 
 List<AchievementState> CollectAchievements()
@@ -167,9 +171,9 @@ List<AchievementState> CollectAchievements()
 
         list.Add(new AchievementState
         {
-            ApiName = apiName,
-            Unlocked = achieved,
-            UnlockTime = unlockTime
+            apiName = apiName,
+            unlocked = achieved,
+            unlockTime = unlockTime
         });
     }
 

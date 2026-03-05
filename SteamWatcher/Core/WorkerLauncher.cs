@@ -27,9 +27,6 @@ public static class WorkerLauncher
     {
         return Path.Combine(
             AppContext.BaseDirectory,
-            "..", "..", "..", "..",
-            "SteamAchievementWorker",
-            "bin", "Debug", "net8.0",
             "SteamAchievementWorker.exe"
         );
     }

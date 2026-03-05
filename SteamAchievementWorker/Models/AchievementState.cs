@@ -3,7 +3,7 @@ namespace SteamAchievementWorker.Models;
 
 public class AchievementState
 {
-    public string ApiName { get; set; } = null!;
-    public bool Unlocked { get; set; }
-    public DateTime? UnlockTime { get; set; }
+    public string apiName { get; set; } = null!;
+    public bool unlocked { get; set; }
+    public DateTime? unlockTime { get; set; }
 }
